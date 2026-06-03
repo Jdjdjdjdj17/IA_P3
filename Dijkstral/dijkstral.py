@@ -1,4 +1,6 @@
 import networkx as nx
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 grafo = {
@@ -17,7 +19,7 @@ for key, value in grafo.items():
 
 def dijkstra(grafo, inicio, fin):
     ## Primero se inicializan las distancias de cada nodo a infinito, excepto el nodo de inicio que se inicializa a 0.
-    distancia, nodo = {vertice: float('inf') for vertice in grafo}, inicio
+    distancia = {vertice: float('inf') for vertice in grafo}
     distancia[inicio] = 0
 
     print("\n\nPrimero se inicializan las distancias en infinito y el nodo de inicio en 0: ", distancia)
@@ -52,6 +54,40 @@ def dijkstra(grafo, inicio, fin):
 
     return distancia, camino
 
+def graficar_grafo(grafo):
+    G = nx.DiGraph()
+
+    for nodo, vecinos in grafo.items():
+        for vecino, peso in vecinos.items():
+            G.add_edge(nodo, vecino, weight = peso)
+
+    pos = nx.spring_layout(G)
+    plt.figure(figsize=(8, 6))
+
+    nx.draw(
+    G,
+    pos,
+        with_labels=True,
+        node_size=700,
+        node_color="lightblue",
+        font_size=10,
+        font_weight="bold"
+    )
+
+    edge_labels = {(u, v): G[u][v]['weight'] for u, v in G.edges()}
+    nx.draw_networkx_edge_labels(
+        G,
+        pos,
+        edge_labels=edge_labels,
+        font_size=10
+    )
+
+    plt.title("Grafos con pesos")
+    plt.savefig('grafo.png')
+    plt.close()
+    from PIL import Image
+    Image.open('grafo.png').show()
+
 
 start = "A"
 end = "G"
@@ -61,6 +97,7 @@ actual = end
 while actual in camino:
     lista.append(actual)
     actual = camino[actual]
-    
+
 lista = lista[::-1]
+graficar_grafo(grafo)
 print("El camino es: ", lista, distancia[end])
